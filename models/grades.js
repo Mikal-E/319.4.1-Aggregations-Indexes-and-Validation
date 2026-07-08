@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 
 /* 1. Changed scores.scores to score.score to match the database.
 2. Changed learner_id to student_id to match the sample data in my Atlas, after we learned during the lab that the datasets for each of us showed differently.
-
 */
 
 const gradeSchema = new mongoose.Schema({
@@ -13,6 +12,7 @@ const gradeSchema = new mongoose.Schema({
             score: { type: Number }
         }
     ],
+    
     class_id: {
         type: Number,
         required: true

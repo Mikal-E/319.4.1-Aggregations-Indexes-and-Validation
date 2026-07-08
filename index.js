@@ -36,23 +36,22 @@ app.get('/', async (req, res) => {
     res.send(result);
 })
 
+// Part 2: Adding Additional Features - Create a GET route at /grades/stats
+
 app.get("/grades/stats", async (req, res) => {
 
-    // Create an aggregation pipeline
+/* Part 2: Adding Additional Features - Within this route, create an aggregation pipeline that returns: 1. learners with a weighted average higher than 70%.
+2. Total number of learners. 3. Percentage of learners with an average above 70%. */
 
     const result = await Grade.aggregate(
         [
-
             {
                 $project:
                 /* specifications: The fields to include or exclude. */
                 {
-                    _id: 0,
                     average: {
                         $avg: "$scores.score"
-                    },
-                    learner_id: 1,
-                    class_id: 1
+                    }
                 }
             },
 
@@ -65,13 +64,16 @@ app.get("/grades/stats", async (req, res) => {
                     }
                 }
             },
+
             {
                 $count:
-                    /* Provide the field name for the count. */
-                    "string"
+                /* Provide the field name for the count. */
+                "learnersAbove70"
             }
         ]
     )
+
+
 }
 
 
