@@ -73,10 +73,86 @@ app.get("/grades/stats", async (req, res) => {
         ]
     )
 
+    const learnersAbove70 = result.length > 0 ? result[0].learnersAbove70 : 0;
+    const totalLearners = await Grade.countDocuments();
+    const percentageAbove70 = (learnersAbove70 / totalLearners) * 100;
+
+    res.send(
+
+        {
+
+            learnersAbove70,
+            totalLearners,
+            percentageAbove70
+
+        }
+
+    )
 
 }
+)
 
+// Part 2: Adding Additional Features - Create a GET route at /grades/stats/:id
 
+app.get("/grades/stats/:id", async (req, res) => {
+
+/* Part 2: Adding Additional Features - Within this route, mimic the above aggregation pipeline, but only for learners within a class that has a class_id equal to the specified :id. */
+
+    const result = await Grade.aggregate(
+
+        [
+            {
+                $match:
+                /* query: The query in MQL. */
+                {
+                    class_id: {
+                        $eq: Number(req.params.id)
+                    }
+                }
+            },
+            {
+                $project:
+                /* specifications: The fields to include or exclude. */
+                {
+                    class_id: 1,
+                    average: {
+                        $avg: "$scores.score"
+                    }
+                }
+            },
+            {
+                $match:
+                /* query: The query in MQL. */
+                {
+                    average: {
+                        $gt: 70
+                    }
+                }
+            },
+            {
+                $count:
+                /* Provide the field name for the count. */
+                "learnersAbove70"
+            }
+        ]
+    )
+
+    const learnersAbove70 = result.length > 0 ? result[0].learnersAbove70 : 0;
+    const totalLearners = await Grade.countDocuments({ class_id: Number(req.params.id) });
+    const percentageAbove70 = (learnersAbove70 / totalLearners) * 100;
+
+    res.send(
+
+        {
+
+            learnersAbove70,
+            totalLearners,
+            percentageAbove70
+
+        }
+
+    )
+}
 )
 
 app.listen(port, () => {
